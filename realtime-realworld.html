@@ -1,0 +1,211 @@
+<head>
+  <title>realtime-realworld</title>
+</head>
+
+<body>
+  {{renderPage}}
+</body>
+
+<template name="slides">
+  <div class="reveal">
+    <div class="slides">
+      <section>
+        <h1>Realtime, Realworld</h1>
+        <h2>#meteorlondon May 2013</h2>
+      </section>
+
+      <section>
+        <h3>Arduino is cool</h3>
+      </section>
+
+      <section>
+        <h3><a href="https://github.com/rwldrn/johnny-five">rwldrn/johnny-five</a></h3>
+        <ul>
+          <li class="fragment">Firmata-based Arduino framework</li>
+          <li class="fragment">JIFSNIF etc etc</li>
+          <li class="fragment">OMG ROBOTS</li>
+        </ul>
+      </section>
+
+      <section>
+        <h3>Yeah but this is a Meteor meetup</h3>
+      </section>
+
+      <section>
+        <h1>Let’s use Meteor!</h1>
+      </section>
+
+      <section>
+        <h3>How about changing slides with a big red button?</h3>
+        <img src="http://moma.org/interactives/exhibitions/2011/talktome/assets/TTM_017-large.jpg">
+      </section>
+
+      <section>
+        <p>Bosh.</p>
+      </section>
+
+      <section>
+        <p>This is fun.</p>
+      </section>
+
+      <section>
+        <h3>Getting Node modules into Meteor is *still* a pain.</h3>
+
+        <pre><code class="javascript" style="font-size: 18px; margin-top: 20px;">
+          packages/johnny-five/package.js
+
+          Package.describe({
+            summary: "Arduino with JavaScript"
+          });
+
+          Npm.depends({"johnny-five": "0.6.2"});
+
+          Package.on_use(function (api) {
+            api.add_files("johnny-five.js", "server");
+          });
+        </code></pre>
+      </section>
+
+      <section>
+        <h3>UNDOCUMENTED SECRET STUFF</h3>
+        <p class="fragment">NPM SemVer or GitHub Tarball</p>
+        <p class="fragment">Not a commit, branch, tag, pull request or anything else. A tarball.</p>
+      </section>
+
+      <section>
+        <h3>Crazy error I forgot to copy the message for.</h3>
+        <p class="fragment">It happened. I think.</p>
+        <p class="fragment">Meteor specific. I think it's a Fibers thing.</p>
+        <p class="fragment"><a href="https://github.com/jongd/johnny-five/commit/e559c10ea4cfa8477f2b661f3457734d136e9e86">This commit</a> fixes it. It’s gross.</p>
+      </section>
+
+      <section>
+        <!-- I HAVE NO IDEA WHAT I'M DOING -->
+        <img src="http://i2.kym-cdn.com/photos/images/original/000/234/765/b7e.jpg">
+      </section>
+
+      <section>
+        <h3>So anyway, with a Tarball link</h3>
+        <pre><code class="javascript" style="font-size: 18px; margin-top: 20px;">
+          packages/johnny-five/package.js
+
+          Package.describe({
+            summary: "Arduino with JavaScript"
+          });
+
+          Npm.depends({"johnny-five": "https://github.com/jongd/johnny-five/tarball/e559c10ea4cfa8477f2b661f3457734d136e9e86"});
+
+          Package.on_use(function (api) {
+            api.add_files("johnny-five.js", "server");
+          });
+        </code></pre>
+      </section>
+
+      <section>
+        <h3>Then to pass it on to the server</h3>
+        <pre><code class="javascript" style="font-size: 18px; margin-top: 20px;">
+          packages/johnny-five/johnny-five.js
+
+          five = Npm.require('johnny-five');
+        </code>
+        </pre>
+      </section>
+
+      <section>
+        <h3>Showtime</h3>
+        <pre><code class="javascript" style="font-size: 18px; margin-top: 20px;">
+          server.js
+
+          var Fiber = Npm.require('fibers');
+          var button, led;
+          var board = new five.Board({
+            debug: true
+          });
+
+          board.on("ready", function() {
+            button = new five.Button(7);
+            led = new five.Led(11);
+
+            button.on("hit", function() {
+              Fiber(function() {
+                console.log('Fade in!');
+                led.pulse();
+              }).run();
+            }).on("release", function() {
+              console.log('Fade out!');
+            });
+          });
+        </code>
+        </pre>
+
+        <p class="fragment">More crazy stuff I don't understand about Fibers.</p>
+      </section>
+
+      <section>
+        <p>What else can we do?</p>
+      </section>
+
+      <section>
+        <p>How about flashing an LED?</p>
+
+      </section>
+
+      <section>
+        <p><span data-action="pulse" class="fragment">Flash.</span> <span data-action="pulse" class="fragment">Flash.</span> <span data-action="pulse" class="fragment">Flash.</span> <span data-action="pulse" class="fragment">Flash.</span> <span data-action="pulse" class="fragment">Flash.</span> <span data-action="pulse" class="fragment">Flash.</span> <span data-action="pulse" class="fragment">Flash.</span> <span data-action="pulse" class="fragment">Flash.</span></p>
+      </section>
+
+      <section>
+        <h3>Meteory</h3>
+
+        <pre><code class="javascript" style="font-size: 18px; margin-top: 20px;">
+          server.js
+          ...
+          Meteor.methods({
+            pulse: function() {
+              if (led !== undefined) {
+                led.pulse();
+                setTimeout(function() {
+                  led.stop().off();
+                }, 1000);
+              }
+            }
+          });
+          ...
+
+
+          client.js
+          ...
+          Meteor.call('pulse');
+          ...
+        </code></pre>
+      </section>
+
+      <section>
+        <h3>What do we do with this amazing piece of awesome?</h3>
+      </section>
+
+      <section>
+        <!-- I HAVE NO IDEA WHAT I'M DOING -->
+        <img src="http://i2.kym-cdn.com/photos/images/original/000/234/765/b7e.jpg">
+      </section>
+
+    </div>
+  </div>
+</template>
+
+<template name="ascii">
+  <h1 style="font-size: {{value.value}}px" class="ascii">Meteor is amazing</h1>
+</template>
+
+<template name="piano">
+  <ul>
+    <li>C</li>
+    <li>D</li>
+    <li>E</li>
+    <li>F</li>
+    <li>G</li>
+    <li>A</li>
+    <li>B</li>
+    <li>C</li>
+  </ul>
+</template>

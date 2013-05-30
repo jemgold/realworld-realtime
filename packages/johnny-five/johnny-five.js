@@ -1,0 +1,1 @@
+five = Npm.require('johnny-five');
